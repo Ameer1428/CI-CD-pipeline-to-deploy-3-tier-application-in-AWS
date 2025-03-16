@@ -1,4 +1,4 @@
-//GITHUB ACTIONS CI/CD
+#GITHUB ACTIONS CI/CD
 name: CI-CD Pipeline - Deploy JPetStore to EC2 Tomcat
 
 on:
