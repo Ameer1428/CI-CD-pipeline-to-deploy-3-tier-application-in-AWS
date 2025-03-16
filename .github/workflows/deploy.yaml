@@ -1,25 +1,28 @@
-name: CI-CD Pipeline - Deploy JPetStore via SSH
+name: CI-CD Pipeline - Deploy JPetStore to EC2 via SSH
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
+    - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Trigger Build on EC2
+    - name: Trigger Build on EC2 Instance
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          export PATH=$JAVA_HOME/bin:$PATH
           cd ~/CI-CD-pipeline-to-deploy-3-tier-application-in-AWS
-          git pull origin main
+          git pull origin master
           ./mvnw clean package -DskipTests
           ./mvnw cargo:redeploy -P tomcat90
