@@ -1,51 +1,82 @@
-    name: Send Success Email Notification
-      if: success()
-      uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: smtp.gmail.com
-        server_port: 587
-        username: ${{ secrets.EMAIL_USERNAME }}
-        password: ${{ secrets.EMAIL_PASSWORD }}
-        subject: ✅ SUCCESS | JPetStore CI Build Completed
-        body: |
-          👋 Hello Ameer's Team,
+name: CI-CD Pipeline - 3-tier App Deployment
 
-          ✅ The GitHub Actions CI pipeline for 3-tier application project has completed successfully.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
-          🔹 Repository: ${{ github.repository }}
-          🔹 Branch: ${{ github.ref_name }}
-          🔹 Run ID: ${{ github.run_id }}
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
-          🔗 View Full Logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-          Keep up the great work!
-        to: tulimillivara@gmail.com
-        cc: yourname@example.com  # <-- (optional: add yourself or a team ID here)
-        from: ${{ secrets.EMAIL_USERNAME }}
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    - name: Send Failure Email Notification
-      if: failure()
-      uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: smtp.gmail.com
-        server_port: 587
-        username: ${{ secrets.EMAIL_USERNAME }}
-        password: ${{ secrets.EMAIL_PASSWORD }}
-        subject: ❌ FAILURE | 3-tier application CI Build Failed
-        body: |
-          👋 Hello Ameer,
+      - name: Build with Maven
+        run: mvn clean install
 
-          ❌ The GitHub Actions CI pipeline for the JPetStore project has **failed**.
+  notify-success:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Send Success Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ SUCCESS | 3-tier applicationn CI/CD Completed"
+          to: ${{ secrets.EMAIL_USERNAME }}
+          from: ${{ secrets.EMAIL_USERNAME }}
+          body: |
+            👋 Hello Ameer's Team,
 
-          🔹 Repository: ${{ github.repository }}
-          🔹 Branch: ${{ github.ref_name }}
-          🔹 Run ID: ${{ github.run_id }}
+            ✅ The GitHub Actions CI/CD pipeline for the 3-tier application project has completed successfully.
 
-          ⚠ Please check the logs and resolve any issues.
+            🔹 Repository: ${{ github.repository }}
+            🔹 Branch: ${{ github.ref_name }}
+            🔹 Run ID: ${{ github.run_id }}
 
-          🔗 View Logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            🔗 View Logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-          Let's fix it and try again! 💪
-        to: tulimillivara@gmail.com
-        cc: yourname@example.com  # <-- (optional: again, you can CC yourself or guide)
-        from: ${{ secrets.EMAIL_USERNAME }}
+            Keep up the great work!
+
+  notify-failure:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Send Failure Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ FAILURE | 3-tier applicationn CI/CD Build Failed"
+          to: ${{ secrets.EMAIL_USERNAME }}
+          from: ${{ secrets.EMAIL_USERNAME }}
+          body: |
+            👋 Hello Ameer's Team,
+
+            ❌ The GitHub Actions CI pipeline for the 3-tier application project has failed.
+
+            🔹 Repository: ${{ github.repository }}
+            🔹 Branch: ${{ github.ref_name }}
+            🔹 Run ID: ${{ github.run_id }}
+
+            ⚠ Please check the logs and resolve any issues.
+
+            🔗 View Logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Let's fix it and try again!
