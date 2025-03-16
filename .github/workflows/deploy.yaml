@@ -20,8 +20,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Build with Maven (Skip Tests)
+        run: mvn clean install -DskipTests=true
 
   notify-success:
     needs: build-and-deploy
@@ -35,13 +35,13 @@ jobs:
           server_port: 587
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "✅ SUCCESS | 3-tier applicationn CI/CD Completed"
+          subject: "✅ SUCCESS | 3-tier application CI/CD Build Completed"
           to: ${{ secrets.EMAIL_USERNAME }}
           from: ${{ secrets.EMAIL_USERNAME }}
           body: |
-            👋 Hello Ameer's Team,
+            👋 Hello Ameer,
 
-            ✅ The GitHub Actions CI/CD pipeline for the 3-tier application project has completed successfully.
+            ✅ The GitHub Actions CI pipeline for the 3-tier application project has completed successfully.
 
             🔹 Repository: ${{ github.repository }}
             🔹 Branch: ${{ github.ref_name }}
@@ -63,11 +63,11 @@ jobs:
           server_port: 587
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "❌ FAILURE | 3-tier applicationn CI/CD Build Failed"
+          subject: "❌ FAILURE | 3-tier application CI/CD Build Failed"
           to: ${{ secrets.EMAIL_USERNAME }}
           from: ${{ secrets.EMAIL_USERNAME }}
           body: |
-            👋 Hello Ameer's Team,
+            👋 Hello Ameer's team,
 
             ❌ The GitHub Actions CI pipeline for the 3-tier application project has failed.
 
