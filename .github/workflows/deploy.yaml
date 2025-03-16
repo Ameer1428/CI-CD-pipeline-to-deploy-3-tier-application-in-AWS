@@ -1,28 +1,4 @@
-name: Simple CI Build - JPetStore
-
-on:
-  push:
-    branches:
-      - master
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Set up Java 17
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - name: Build using Maven
-      run: mvn clean package -DskipTests
-
-    - name: Send Success Email Notification
+    name: Send Success Email Notification
       if: success()
       uses: dawidd6/action-send-mail@v3
       with:
@@ -30,12 +6,46 @@ jobs:
         server_port: 587
         username: ${{ secrets.EMAIL_USERNAME }}
         password: ${{ secrets.EMAIL_PASSWORD }}
-        subject: ✅ Build Success - JPetStore Project
+        subject: ✅ SUCCESS | JPetStore CI Build Completed
         body: |
-          Hello Ameer,
+          👋 Hello Ameer's Team,
 
-          Your simple CI build pipeline has completed successfully.
+          ✅ The GitHub Actions CI pipeline for 3-tier application project has completed successfully.
 
-          View logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        to: your-email@example.com
+          🔹 Repository: ${{ github.repository }}
+          🔹 Branch: ${{ github.ref_name }}
+          🔹 Run ID: ${{ github.run_id }}
+
+          🔗 View Full Logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          Keep up the great work!
+        to: tulimillivara@gmail.com
+        cc: yourname@example.com  # <-- (optional: add yourself or a team ID here)
+        from: ${{ secrets.EMAIL_USERNAME }}
+
+    - name: Send Failure Email Notification
+      if: failure()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: ❌ FAILURE | 3-tier application CI Build Failed
+        body: |
+          👋 Hello Ameer,
+
+          ❌ The GitHub Actions CI pipeline for the JPetStore project has **failed**.
+
+          🔹 Repository: ${{ github.repository }}
+          🔹 Branch: ${{ github.ref_name }}
+          🔹 Run ID: ${{ github.run_id }}
+
+          ⚠ Please check the logs and resolve any issues.
+
+          🔗 View Logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          Let's fix it and try again! 💪
+        to: tulimillivara@gmail.com
+        cc: yourname@example.com  # <-- (optional: again, you can CC yourself or guide)
         from: ${{ secrets.EMAIL_USERNAME }}
